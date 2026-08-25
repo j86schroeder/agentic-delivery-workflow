@@ -30,10 +30,6 @@ This repository demonstrates a complete AI-assisted software delivery cycle usin
 
 The coding agent performed implementation work, while the human remained responsible for requirements, product decisions, review, corrective feedback, independent verification, and final delivery.
 
-## Start here
-
-See GitHub Issue #1 for the initial business requirement and acceptance criteria.
-
 ## Example application: Change Request Risk API
 
 A small FastAPI service that evaluates a proposed change request: whether it
@@ -91,11 +87,10 @@ curl -X POST http://127.0.0.1:8000/change-requests/evaluate \
 }
 ```
 
-The endpoint always returns HTTP 200. Whether the request is well-formed and
-how risky it is are both communicated in the response body, not the HTTP
-status code — the request was still successfully *evaluated* even when it
-turns out to be invalid. HTTP 422 is only returned if the request body isn't
-valid JSON at all.
+For parseable change requests, the evaluation endpoint returns HTTP 200.
+Whether the request is valid and how risky it is are communicated in the
+response body. Malformed or unparseable JSON may use FastAPI's normal
+framework-level error response.
 
 An invalid/incomplete request looks like this:
 
