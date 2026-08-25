@@ -4,20 +4,19 @@ A practical example of AI-assisted software delivery using a coding agent inside
 
 This repository demonstrates a normal software-development workflow in which the coding agent performs implementation work while a human remains responsible for requirements, engineering decisions, review, correction, verification, and delivery.
 
-## Delivery workflow
+## Delivery workflow walkthrough
 
-1. Business requirement captured in a GitHub Issue
-2. Testable acceptance criteria defined before implementation
-3. Development performed on a feature branch
-4. Coding agent implements against the requirement
-5. Human reviews the agent-produced code
-6. Review findings are turned into corrective feedback
-7. Agent revises the implementation
-8. Human independently runs tests and verifies behavior
-9. Changes are reviewed through a pull request
-10. Approved work is merged into `main`
+This repository demonstrates a complete AI-assisted software delivery cycle using normal GitHub development artifacts:
 
-The example application is intentionally small so the delivery process and engineering decisions remain easy to inspect.
+1. [Issue #1](https://github.com/j86schroeder/agentic-delivery-workflow/issues/1) — business requirement and acceptance criteria.
+2. The Issue #1 discussion records product clarifications made before implementation.
+3. [Pull Request #2](https://github.com/j86schroeder/agentic-delivery-workflow/pull/2) — initial implementation delivered on a feature branch.
+4. The PR discussion records independent human review findings and the resulting corrective decision.
+5. The implementation was revised with regression tests covering the review findings.
+6. The corrected behavior was independently verified before merge.
+7. The feature branch was squash-merged into `main`.
+
+The coding agent performed implementation work, while the human remained responsible for requirements, product decisions, review, corrective feedback, independent verification, and final delivery.
 
 ## Start here
 
