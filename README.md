@@ -4,6 +4,18 @@ A practical example of AI-assisted software delivery using a coding agent inside
 
 This repository demonstrates a normal software-development workflow in which the coding agent performs implementation work while a human remains responsible for requirements, engineering decisions, review, correction, verification, and delivery.
 
+## Visual overview
+
+<p align="center">
+  <img
+    src="docs/images/ai-assisted-delivery-workflow.png"
+    alt="Diagram showing the AI-assisted delivery workflow and the application overview for the change request risk API"
+    width="1100"
+  />
+</p>
+
+This diagram summarizes both the human-led AI-assisted delivery workflow and the small FastAPI application implemented in this repository.
+
 ## Delivery workflow walkthrough
 
 This repository demonstrates a complete AI-assisted software delivery cycle using normal GitHub development artifacts:
