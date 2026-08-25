@@ -187,3 +187,45 @@ def test_weak_justification_bump_is_capped_at_high():
     payload["business_justification"] = "asap"
     body = evaluate(payload)
     assert body["risk_level"] == "high"  # already high, stays capped
+
+
+# --- Regression: unknown-environment risk -----------------------------------
+
+
+def test_missing_environment_yields_unknown_risk():
+    payload = copy.deepcopy(VALID_PAYLOAD)
+    payload["environment"] = ""
+    body = evaluate(payload)
+    assert body["valid"] is False
+    assert body["risk_level"] == "unknown"
+
+
+def test_unsupported_environment_yields_unknown_risk():
+    payload = copy.deepcopy(VALID_PAYLOAD)
+    payload["environment"] = "sandbox"
+    body = evaluate(payload)
+    assert body["valid"] is False
+    assert body["risk_level"] == "unknown"
+
+
+def test_weak_justification_does_not_turn_unknown_risk_into_a_known_risk():
+    payload = copy.deepcopy(VALID_PAYLOAD)
+    payload["environment"] = "sandbox"
+    payload["business_justification"] = "asap"
+    body = evaluate(payload)
+    assert body["risk_level"] == "unknown"
+    assert len(body["warnings"]) == 1  # the weakness warning still fires
+
+
+# --- Regression: weak-justification warning wording --------------------------
+
+
+def test_weak_justification_warning_describes_the_actual_rule():
+    payload = copy.deepcopy(VALID_PAYLOAD)
+    payload["business_justification"] = "asap"
+    body = evaluate(payload)
+    assert len(body["warnings"]) == 1
+    warning = body["warnings"][0]
+    assert "20 non-whitespace characters" in warning
+    assert "4 words" in warning
+    assert "or" in warning  # the rule is fewer-than-X OR fewer-than-Y, not "and"

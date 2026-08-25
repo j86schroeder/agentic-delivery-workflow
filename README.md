@@ -103,13 +103,13 @@ curl -X POST http://127.0.0.1:8000/change-requests/evaluate \
 ```json
 {
   "valid": false,
-  "risk_level": "medium",
+  "risk_level": "unknown",
   "errors": [
     "description is required",
     "environment 'sandbox' is not supported; must be one of: development, test, staging, production"
   ],
   "warnings": [
-    "business_justification is weak; provide at least 20 characters and 4 words of detail"
+    "business_justification is weak: it has fewer than 20 non-whitespace characters or fewer than 4 words"
   ]
 }
 ```
@@ -140,14 +140,18 @@ Baseline risk comes from the environment:
 | test | low |
 | staging | medium |
 | production | high |
+| missing or unsupported | unknown |
 
-A weak business justification raises that baseline by one level (low →
-medium, medium → high), capped at high. `change_type` does not affect the
-risk level — Issue #1 does not define change-type-specific risk rules.
+A weak business justification raises a *known* baseline by one level (low →
+medium, medium → high), capped at high. It does **not** turn an `unknown`
+risk level into a known one — an unknown risk stays `unknown` regardless of
+the justification. `change_type` does not affect the risk level — Issue #1
+does not define change-type-specific risk rules.
 
-A risk level is always returned, even for an invalid request, computed from
-whatever environment/justification values were supplied (falling back to the
-lowest baseline if the environment is missing or unsupported).
+A risk level is always returned, even for an invalid request. When the
+environment is missing or unsupported there is no baseline to compute risk
+from, so `risk_level` is `"unknown"` rather than being understated as
+`"low"`.
 
 ### Testing
 
@@ -160,7 +164,9 @@ Tests are API-level (via FastAPI's `TestClient`) and are organized one per
 acceptance criterion from Issue #1: the health endpoint, required-field
 validation, supported/unsupported environments, weak/missing business
 justification, production-vs-non-production risk, the weak-justification
-risk bump and its cap, multiple validation problems reported together, and
+risk bump and its cap, an unknown environment's risk staying `"unknown"`
+(including when combined with a weak justification), multiple validation
+problems reported together, and
 the shape of the response (`valid`, `risk_level`, `errors`, `warnings`).
 
 ### Design notes

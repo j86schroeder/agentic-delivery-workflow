@@ -36,6 +36,11 @@ MIN_JUSTIFICATION_CHARS = 20
 # A justification with fewer than this many words is weak.
 MIN_JUSTIFICATION_WORDS = 4
 
+# Risk level used when the environment is missing or unsupported, since no
+# baseline can be determined for it. Deliberately not "low": an unknown
+# environment must not be understated as low risk.
+UNKNOWN_RISK = "unknown"
+
 
 def _is_blank(value: Optional[str]) -> bool:
     return value is None or not value.strip()
@@ -91,16 +96,21 @@ def evaluate_change_request(change_request: ChangeRequestIn) -> EvaluationResult
         weak_justification = is_weak_justification(change_request.business_justification)
         if weak_justification:
             warnings.append(
-                "business_justification is weak; provide at least "
-                f"{MIN_JUSTIFICATION_CHARS} characters and {MIN_JUSTIFICATION_WORDS} words "
-                "of detail"
+                "business_justification is weak: it has fewer than "
+                f"{MIN_JUSTIFICATION_CHARS} non-whitespace characters or fewer than "
+                f"{MIN_JUSTIFICATION_WORDS} words"
             )
 
-    # Fall back to the lowest baseline when the environment is missing or
-    # unsupported, since a risk level is always returned even for an
-    # otherwise-invalid request.
-    baseline_risk = RISK_BASELINE.get(normalized_environment, "low")
-    risk_level = _bump_risk_level(baseline_risk) if weak_justification else baseline_risk
+    # A missing or unsupported environment has no known baseline, so the
+    # risk level is "unknown" rather than defaulting to "low" (which would
+    # understate the risk of a change we can't actually assess). A weak
+    # justification only bumps a *known* baseline by one level; it must not
+    # turn an unknown risk into a known one.
+    if normalized_environment in RISK_BASELINE:
+        baseline_risk = RISK_BASELINE[normalized_environment]
+        risk_level = _bump_risk_level(baseline_risk) if weak_justification else baseline_risk
+    else:
+        risk_level = UNKNOWN_RISK
 
     return EvaluationResult(
         valid=len(errors) == 0,
